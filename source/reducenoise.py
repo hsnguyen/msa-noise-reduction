@@ -105,7 +105,6 @@ def reduceNoise(msa):
 	i = 0
 	while i < msa.get_alignment_length():
 		while isNoise(msa, i):
-			print i
 			msa = msa[:, :i] + msa[:, i+1:]
 		i += 1
 	
@@ -121,11 +120,23 @@ try:
 except IOError:
 	print >> sys.stderr, 'ERROR! cannot open inputfile:', inputf
 	sys.exit(1)
+
+if msa.get_alignment_length() == 0:
+	print >> sys.stderr, 'ERROR! length of the provided MSA is 0'
+	sys.exit(1)
+
+msa = reduceNoise(msa)
+
+if msa.get_alignment_length() == 0:
+	print >> sys.stderr, 'ERROR! the length of the MSA after reducing noise is 0'
+	sys.exit(1)
+
+writeMSA(msa, outputf)
 #######################################################################################################
 # testing script here!!!
 #######################################################################################################
-print msa.get_alignment_length()
-msa = reduceNoise(msa)
-print msa.get_alignment_length()
-writeMSA(msa, outputf)
+#print msa.get_alignment_length()
+#msa = reduceNoise(msa)
+#print msa.get_alignment_length()
+#writeMSA(msa, outputf)
 
