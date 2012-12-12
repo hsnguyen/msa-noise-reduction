@@ -51,23 +51,81 @@ def readMSA(inputfile):
 	alignment = AlignIO.read(ifile, 'fasta')
 	ifile.close()
 	return alignment
+
 def writeMSA(msa, outputfile):
 	'''
 	write the provided msa to file
 	'''
 	ofile = open(outputfile, 'w')
-	ofile.write(msa.format('fasta'))
+	AlignIO.write(msa, ofile, 'fasta')
 	ofile.close()
+
+def isNoise(msa, pos):
+	'''
+	check if specific column in alignment is noise or not
+	return True if yes, False otherwise
+	'''
+	aa = {}
+	for i in range(0, len(msa)):
+		if msa[i, pos] not in aa:
+			aa[msa[i, pos]] = 1
+		else:
+			aa[msa[i, pos]] += 1
+	
+	numOfUniques = 0
+	numOfGoodAA = 0
+	numOfIndels = 0
+	for key, value in aa.items():
+		if value == 1:
+			numOfUniques += 1
+		if value > 2:
+			numOfGoodAA += 1
+		if key == '-' or key == '.':
+			numOfIndels += value
+
+	
+	# if more than 50% are indels
+	if numOfIndels >= (len(msa) * 1./2):
+		return True
+	# if more than 50% are unique amino acids
+	if numOfUniques >= (len(msa) * 1./2):
+		return True
+	# if there is no aa that appears more than twice
+	if numOfGoodAA == 0:
+		return True
+
+	return False
+	
+def reduceNoise(msa):
+	'''
+	reduce the noises in MSA
+	input: MSA with noises
+	output: MSA without noises
+	'''
+	i = 0
+	while i < msa.get_alignment_length():
+		while isNoise(msa, i):
+			print i
+			msa = msa[:, :i] + msa[:, i+1:]
+		i += 1
+	
+	return msa
+	
+
 #######################################################################################################
 # running script here!!!
 #######################################################################################################
+msa = None
 try:
-	alignment = readMSA(inputf)
+	msa = readMSA(inputf)
 except IOError:
 	print >> sys.stderr, 'ERROR! cannot open inputfile:', inputf
 	sys.exit(1)
 #######################################################################################################
 # testing script here!!!
 #######################################################################################################
-writeMSA(alignment, outputf)
-	
+print msa.get_alignment_length()
+msa = reduceNoise(msa)
+print msa.get_alignment_length()
+writeMSA(msa, outputf)
+
