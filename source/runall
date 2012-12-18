@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+dir=$(date +"%Y%m%d%H%M")
+mkdir ../result/$dir
+./evaluate -dir ../data/symmetric_0.5 > ../result/$dir/symmetric_0.5
+./evaluate -dir ../data/asymmetric_0.5 > ../result/$dir/asymmetric_0.5
+./evaluate -dir ../data/symmetric_1.0 > ../result/$dir/symmetric_1.0
+./evaluate -dir ../data/asymmetric_1.0 > ../result/$dir/asymmetric_1.0
+./evaluate -dir ../data/symmetric_2.0 > ../result/$dir/symmetric_2.0
+./evaluate -dir ../data/asymmetric_2.0 > ../result/$dir/asymmetric_2.0
+
