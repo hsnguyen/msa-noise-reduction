@@ -1,10 +1,10 @@
 #! /usr/bin/env python
-import sys, glob
+import sys, glob, dendropy
 from subprocess import Popen, PIPE
 from os import listdir
 from os.path import isfile, join
 orig_algn = []
-
+testdir='./'
 try:
     if sys.argv[1] == '-dir':
         testdir = sys.argv[2]
@@ -16,12 +16,84 @@ try:
 except IOError as e:
     print e
     print >> sys.stderr , 'ERROR! Must be:'
-    print >> sys.stderr , './evaluate [-dir directory] [multialignment files]'
+    print >> sys.stderr , './evaluate [-dir directory] [-ref referent tree file] [multialignment files]'
 
 #print orig_algn
 reduced_algn = [ (f+'.reduced') for f in orig_algn ]
 #print reduced_algn
-for i in range(len(orig_algn)):
-    cmd= './reducenoise.py -in '+orig_algn[i]+ ' -out ' + reduced_algn[i]
-    p=Popen(cmd,shell=True,stdout=PIPE)
+
+##looking for reference tree
+hasRef=False
+refTree=dendropy.Tree()
+try:
+    for i in range(1,len(sys.argv)):
+        if sys.argv[i]=='-ref':
+            hasRef=True
+            refTree.read_from_path(sys.argv[i+1],'newick')
+    ## Trying to look for referent tree automatically
+    if hasRef==False:
+        path=glob.glob(join(testdir,'*tree*'))
+        if len(path) == 1:
+            refTree=dendropy.Tree.get_from_path(path[0],'newick')
+        else:
+            print >> stderr, 'Cannot find referent tree'
+            sys.exit()
+except IOError:
+    print >> stderr, 'Cannot open referent file!'
+    sys.exit()
+
+###########################################################################
+# definition here
+###########################################################################
+def runReduce(inputfile, outputfile):
+    '''
+    calling script to reduce noise from alignment
+    '''
+    cmd= './reducenoise.py -in '+inputfile+ ' -out ' + outputfile
+    #print cmd
+    p=Popen(cmd,shell=True,stdout=PIPE,stderr=PIPE)
     p.wait()
+    return
+     
+def runTree(inputfile):
+    '''
+    calling program from FastPhylo to create newick tree from alignment
+    '''
+    cmd= "../bin/fastprot -I fasta "+inputfile + " | ../bin/fnj -O newick"
+    p=Popen(cmd,shell=True,stdout=PIPE,stderr=PIPE)
+    p.wait()
+    return p.stdout
+
+##########################################################################
+# running script
+##########################################################################
+print "Distance from referent tree vs trees recovered from intact and reduced noise multialignment"
+count=0
+count_bad=0
+orig_score=0.0
+redu_score=0.0
+for i in range(len(orig_algn)):
+    runReduce(orig_algn[i], reduced_algn[i])
+    if not isfile(reduced_algn[i]): 
+        print >> sys.stderr, 'Error when creating reduced alignment'
+        print >> sys.stderr, "Original: %s \t Reduced: %s" % (orig_algn[i],reduced_algn[i])
+        continue
+    try:
+        originalTree=dendropy.Tree.get_from_stream(runTree(orig_algn[i]),'newick')
+        reducedTree=dendropy.Tree.get_from_stream(runTree(reduced_algn[i]),'newick')
+        orig_dis=refTree.symmetric_difference(originalTree)
+        redu_dis=refTree.symmetric_difference(reducedTree) 
+        count=count+1
+        orig_score=orig_score+orig_dis
+        redu_score=redu_score+redu_dis
+        if orig_dis < redu_dis:
+            count_bad = count_bad + 1
+
+        print "%.2f \t %.2f" % (orig_dis,redu_dis)    
+    except IOError as e: 
+        print e
+        sys.exit()
+print "Number of tree compared: %d" % count
+print "Times that reduced noise process make it worse: %d" % count_bad
+print "Average distance from referent tree to recovered tree: %f" % (orig_score/count)
+print "Average distance from referent tree to reduced noise tree: %f" % (redu_score/count)
