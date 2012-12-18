@@ -104,7 +104,7 @@ def reduceNoise(msa):
 	'''
 	i = 0
 	while i < msa.get_alignment_length():
-		while isNoise(msa, i):
+		while i < msa.get_alignment_length() and isNoise(msa, i):
 			msa = msa[:, :i] + msa[:, i+1:]
 		i += 1
 	
@@ -125,8 +125,9 @@ if msa.get_alignment_length() == 0:
 	print >> sys.stderr, 'ERROR! length of the provided MSA is 0'
 	sys.exit(1)
 
+print 'length before reducing:', msa.get_alignment_length()
 msa = reduceNoise(msa)
-
+print 'length after reducing:', msa.get_alignment_length()
 if msa.get_alignment_length() == 0:
 	print >> sys.stderr, 'ERROR! the length of the MSA after reducing noise is 0'
 	sys.exit(1)
