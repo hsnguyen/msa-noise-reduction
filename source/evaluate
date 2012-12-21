@@ -3,8 +3,12 @@ import sys, glob, dendropy
 from subprocess import Popen, PIPE
 from os import listdir
 from os.path import isfile, join
+
+
+
 orig_algn = []
 testdir='./'
+
 try:
     if sys.argv[1] == '-dir':
         testdir = sys.argv[2]
@@ -89,11 +93,12 @@ for i in range(len(orig_algn)):
         if orig_dis < redu_dis:
             count_bad = count_bad + 1
 
-        print "%.2f \t %.2f" % (orig_dis,redu_dis)    
+        print "%s\t%.2f\t%.2f" % (orig_algn[i],orig_dis,redu_dis)    
     except IOError as e: 
         print e
         sys.exit()
+print "###############################################################################"
 print "Number of tree compared: %d" % count
 print "Times that reduced noise process make it worse: %d" % count_bad
-print "Average distance from referent tree to recovered tree: %f" % (orig_score/count)
-print "Average distance from referent tree to reduced noise tree: %f" % (redu_score/count)
+print "Average distance from reference tree to recovered tree: %f" % (orig_score/count)
+print "Average distance from reference tree to reduced noise tree: %f" % (redu_score/count)
