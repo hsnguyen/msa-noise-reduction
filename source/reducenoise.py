@@ -65,7 +65,7 @@ def isNoise(msa, pos):
 	check if specific column in alignment is noise or not
 	return True if yes, False otherwise
 	'''
-	aa = {}
+	aa = {} # dict that counts the appearances of amino acids
 	for i in range(0, len(msa)):
 		if msa[i, pos] not in aa:
 			aa[msa[i, pos]] = 1
@@ -117,8 +117,8 @@ def reduceNoise(msa):
 msa = None
 try:
 	msa = readMSA(inputf)
-except IOError:
-	print >> sys.stderr, 'ERROR! cannot open inputfile:', inputf
+except:
+	print >> sys.stderr, 'ERROR! please select Fasta file'
 	sys.exit(1)
 
 if msa.get_alignment_length() == 0:
