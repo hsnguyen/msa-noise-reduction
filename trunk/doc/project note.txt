@@ -1,0 +1,27 @@
+Dec 11, 2012: 
+-After studying the requirements of three projects, we came to agreement chosing project 2 as the final option. 
+-A directory was created on Google Code with structure followed the guide on PLoS paper. 
+
+Dec 12, 2012:
+-A python script with pre-defined parameters handling and FileIO is added.
+-A script that could remove noises as requirements from a single MSA is completed.
+-Some controls were included by using exception catching and error handling.
+
+Dec 13, 2012:
+-The executable files fastprot and fnj were not working on our labtop. We have to download source code with the most up-to-date revision and build it on local computers.
+-Some test are held successfully in single alignment to reconstruct phylogenetic tree.
+
+Dec 18, 2012:
+-Start writing the evaluation script to calculate the distance between phylogenies.
+-There appeared a bug "list index out of range" in the script used to remove noise. Fixed.
+-Evaluation script is finished. Top-level script 'runall' is also added.
+-Having some first results.
+
+Dec 21, 2012:
+-Adding some possible control circumstances to our code.
+-Doing some modifications on previous script to store results in SQL database. 
+-A python script for plotting and making statistical conclusion is finished.
+
+Dec 22, 2012:
+-Finish lab report.
+-Finish project.
