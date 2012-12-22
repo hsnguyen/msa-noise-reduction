@@ -1,0 +1,38 @@
+Folder structure:
+	doc folder: 	project report and notebook
+	source folder: 	running scripts
+	bin folder:	supporting programs
+	results: 	inside each subfolder are SQLite database and logs for each running time.
+	data: 		testing data
+
+
+Project requirement:
+	Python 2.7
+	Biopython 1.6
+	SQLite 3
+
+
+Project environment:
+	Unix
+
+
+To remove noisy column from one MSA file, use this command:
+	./reducenoise.py -in inputFile -out outputFile	
+both inputFile and outputFile are Fasta format
+
+
+To evaluate the constructed tree from denoised MSA files in a folder, use this command:
+	./evaluate -dir folderName
+this command will write all distances and corresponding file name to stdout
+
+
+To stores the calculated distances, use this command:
+	./updateSQL.py -in statisticInput -out sqliteFile
+this script takes the output of the evaluate command as its input, all the distances will then be stored in SQLite database
+
+
+To execute all above steps with all provided data use runall script inside source folder. This script will create a subfolder in side results folder that corresponded to the running time (format: yyyymmddhhmm)
+	
+	
+
+ 
